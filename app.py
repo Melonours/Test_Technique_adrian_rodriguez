@@ -2,8 +2,7 @@
 import sqlite3
 import wikipedia
 
-#Set up de la langue par défaut de wikipédia en français
-#TODO permettre à l'utilisateur de changer la langue de wikipédia
+#Set up de la langue par défaut de wikipédia en français (non utilisé)
 # wikipedia.set_lang("fr")
 
 
@@ -88,7 +87,7 @@ def wikipedia_search(rep):
 
 #Fonction principale de rechercher de l'application
 def search(answer):
-    rep = wikipedia.search(answer, results = 1)
+    rep = wikipedia.search(answer, results=1)
     # print(rep)
 
     if rep == [] or None:
@@ -127,7 +126,7 @@ def search(answer):
         #     print(e)
 
 
-#Variables globales
+#**Variables globales
 user_ans = ""
 user_validation = ""
 
@@ -135,7 +134,7 @@ commands = ["exit", "help", "search"]
 
 validate_list = ["Yes", "Oui", "Y", "O", ""]
 
-#Début de l'app
+#**Début de l'app
 print('Welcome to the app ! \n \nType "help" to see more commands')
 
 while True : 
