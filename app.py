@@ -1,16 +1,15 @@
 #Import des librairies utilisées
 from os import error
+from re import S
 import sqlite3
 import wikipedia
 
 #Set up de la langue par défaut de wikipédia en français
+#TODO permettre à l'utilisateur de changer la langue de wikipédia
 # wikipedia.set_lang("fr")
 
 
-#Fonctions utilisées dans l'app
-
-#Fonction d'insertion dans la DB
-
+#**Fonctions utilisées dans l'app
 
 #Fonction de recherche du nom demandé par l'utilisateur sur wikipédia
 # def validate(user_request):
@@ -26,8 +25,6 @@ import wikipedia
 #         print(joe.summary)
 #     except wikipedia.exceptions.DisambiguationError as e :
 #         print(e.options)
-
-
 
 #Fonction de lancement de la recherche et de suggestion en cas de mauvaise typo
 # def search(answer): 
@@ -48,7 +45,14 @@ import wikipedia
 #     else :
 #         print("joe")
 
+def add_to_db(answer):
+    print("added to db")
+
 def validate(user_validation):
+    if user_validation in validate_list:
+        return True
+    else:
+        return False
     
 
 def search(answer):
@@ -58,15 +62,33 @@ def search(answer):
     if rep == []:
         print("I don't know this person \n")
         rep = wikipedia.suggest(answer).title()
-        input(f"Did you mean {rep} ?")
+        
+        user_validation = input(f"Did you mean {rep} ?").title()
+        validate(user_validation)
+        try:
+            person = wikipedia.page(rep, auto_suggest=False)
+            print(person.title, person.summary)
+            user_validation = input("Do you want to add it to the db ?").title()
+            validation = validate(user_validation)
+            if validation == True :
+                add_to_db(person)
+        except wikipedia.exceptions.PageError as e:
+            print(e)
+    else :
+        try:
+            person = wikipedia.page(rep, auto_suggest=False)
+            print(person.title, person.summary)
+            user_validation = input("Do you want to add it to the db ?").title()
+            validation = validate(user_validation)
+            if validation == True :
+                add_to_db(person)
+        except wikipedia.exceptions.PageError as e:
+            print(e)
 
-    validate()
-
-    person = wikipedia.page(rep, auto_suggest=False)
-    print(person.title)
 
 #Variables globales
 user_ans = ""
+user_validation = ""
 
 commands = ["exit", "help", "search"]
 
