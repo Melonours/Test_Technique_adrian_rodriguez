@@ -1,6 +1,4 @@
 #Import des librairies utilisées
-from os import error
-from re import S
 import sqlite3
 import wikipedia
 
@@ -45,45 +43,81 @@ import wikipedia
 #     else :
 #         print("joe")
 
-def add_to_db(answer):
-    print("added to db")
 
+#Fonction d'insertion de la data dans la DB
+def add_to_db(data):
+    # print(data.title, data.summary)
+    title = data.title
+    summary = data.summary
+    data_to_insert = [title, summary]
+    # print(type(title), type(summary))
+    con = sqlite3.connect("wikiDB.db")
+    cur = con.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS famous_people(id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(65) , summary VARCHAR(127))")
+    cur.execute(f"INSERT INTO famous_people(name, summary) VALUES (?, ?)", data_to_insert)
+    con.commit()
+
+    for row in cur.execute('SELECT * FROM famous_people'):
+        print(row)
+    con.close
+    
+
+#Fonction de validation du choix de l'utilisateur
 def validate(user_validation):
     if user_validation in validate_list:
         return True
     else:
         return False
-    
 
+#Fonction de recherche sur wikipedia et gestion d'erreurs si page non trouvée    
+def wikipedia_search(rep):
+    try:
+        person = wikipedia.page(rep, auto_suggest=False)
+        # print(person.original_title, person.summary)
+        user_validation = input("Do you want to add it to the db ?").title()
+        validation = validate(user_validation)
+        if validation == True :
+            add_to_db(person)
+    except wikipedia.exceptions.PageError as e:
+            print(e)
+
+#Fonction principale de rechercher de l'application
 def search(answer):
     rep = wikipedia.search(answer, results = 1)
-    print(rep)
+    # print(rep)
 
     if rep == []:
         print("I don't know this person \n")
         rep = wikipedia.suggest(answer).title()
         
         user_validation = input(f"Did you mean {rep} ?").title()
-        validate(user_validation)
-        try:
-            person = wikipedia.page(rep, auto_suggest=False)
-            print(person.title, person.summary)
-            user_validation = input("Do you want to add it to the db ?").title()
-            validation = validate(user_validation)
-            if validation == True :
-                add_to_db(person)
-        except wikipedia.exceptions.PageError as e:
-            print(e)
+        validation = validate(user_validation)
+        if validation == True:
+            wikipedia_search(rep)
+        else :
+            print("Alright")
+        #* Refactorisé dans une seule fonction afin d'éviter la répétition
+        # try:
+        #     person = wikipedia.page(rep, auto_suggest=False)
+        #     print(person.title, person.summary)
+        #     user_validation = input("Do you want to add it to the db ?").title()
+        #     validation = validate(user_validation)
+        #     if validation == True :
+        #         add_to_db(person)
+        # except wikipedia.exceptions.PageError as e:
+        #     print(e)
     else :
-        try:
-            person = wikipedia.page(rep, auto_suggest=False)
-            print(person.title, person.summary)
-            user_validation = input("Do you want to add it to the db ?").title()
-            validation = validate(user_validation)
-            if validation == True :
-                add_to_db(person)
-        except wikipedia.exceptions.PageError as e:
-            print(e)
+        wikipedia_search(rep)
+        #* Refactorisé dans une seule fonction afin d'éviter la répétition
+        # try:
+        #     person = wikipedia.page(rep, auto_suggest=False)
+        #     print(person.title, person.summary)
+        #     user_validation = input("Do you want to add it to the db ?").title()
+        #     validation = validate(user_validation)
+        #     if validation == True :
+        #         add_to_db(person)
+        # except wikipedia.exceptions.PageError as e:
+        #     print(e)
 
 
 #Variables globales
