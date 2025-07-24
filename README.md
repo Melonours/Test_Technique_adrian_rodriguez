@@ -6,3 +6,5 @@ Tout d'abord au lancement du projet, bien créé et se mettre en environnement v
 
 Installer les dépendances grâce à cette ligne de code dans le terminal une fois l'environnement créé : pip install -r requirements.txt
 
+Utiliser une extension afin de voir le contenu SQLite
+

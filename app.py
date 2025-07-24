@@ -57,10 +57,13 @@ def add_to_db(data):
     cur.execute(f"INSERT INTO famous_people(name, summary) VALUES (?, ?)", data_to_insert)
     con.commit()
 
+    #* Décommenter ceci afin de pouvoir voir l'ensemble des données dans la db 
     for row in cur.execute('SELECT * FROM famous_people'):
         print(row)
+
     con.close
     
+    print("Data added succesfully !")
 
 #Fonction de validation du choix de l'utilisateur
 def validate(user_validation):
@@ -74,10 +77,12 @@ def wikipedia_search(rep):
     try:
         person = wikipedia.page(rep, auto_suggest=False)
         # print(person.original_title, person.summary)
-        user_validation = input("Do you want to add it to the db ?").title()
+        user_validation = input(f"Do you want to add {person.title} to the db ?").title()
         validation = validate(user_validation)
         if validation == True :
             add_to_db(person)
+        else:
+            print("Insertion aborted")
     except wikipedia.exceptions.PageError as e:
             print(e)
 
@@ -86,16 +91,18 @@ def search(answer):
     rep = wikipedia.search(answer, results = 1)
     # print(rep)
 
-    if rep == []:
+    if rep == [] or None:
         print("I don't know this person \n")
-        rep = wikipedia.suggest(answer).title()
-        
-        user_validation = input(f"Did you mean {rep} ?").title()
-        validation = validate(user_validation)
-        if validation == True:
-            wikipedia_search(rep)
-        else :
-            print("Alright")
+        rep = wikipedia.suggest(answer)
+        if rep == None :
+            print("Can't search for an empty query !")
+        else:
+            user_validation = input(f"Did you mean {rep} ?").title()
+            validation = validate(user_validation)
+            if validation == True:
+                wikipedia_search(rep)
+            else :
+                print("Alright")
         #* Refactorisé dans une seule fonction afin d'éviter la répétition
         # try:
         #     person = wikipedia.page(rep, auto_suggest=False)
@@ -134,7 +141,7 @@ print('Welcome to the app ! \n \nType "help" to see more commands')
 while True : 
     cmd = input("\n >>").strip()
     if cmd == "exit":
-        print("bye")
+        print("Bye bye !")
         break
     if cmd == "help":
         print(f"\nHere are the available commands : {commands} ")
@@ -142,6 +149,9 @@ while True :
         print('\nUnknown command, type "help" to see the available commands')
     if cmd == "search":
         user_ans = input("\nPlease type the name of the person you're looking for : \n")
-        search(user_ans)
+        if user_ans.isdigit():
+            print("Can't search for only numbers !")
+        else :
+            search(user_ans)
 
 
